@@ -6,8 +6,8 @@ def create_serializers_and_views():
         models_ast = ast.parse(file.read())
 
 
-    serializers_ast = _read_template('./templates/serializers')
-    views_ast = _read_template('./templates/views')
+    serializers_ast = _read_template('serializers')
+    views_ast = _read_template('views')
 
     model_classes = [clss for clss in models_ast.body if clss.__class__ is ast.ClassDef]
 
@@ -22,19 +22,14 @@ class {mc.name}Serializer(serializers.ModelSerializer):
         fields = ('id',{", ".join([f"'{field_name.targets[0].id}'" for field_name in class_fields])})
             """))
 
-        views_ast.body.append(ast.parse(f"""
-class {mc.name}ViewSet(viewsets.ModelViewSet):
-    queryset = {mc.name}.objects.all()
-    serializer_class = {mc.name}Serializer
-            """))
-
+        views_ast.body.append(_read_template('viewset', model_class_name=mc.name))
 
     _write_result('./serializers.py', serializers_ast)
     _write_result('./views.py', views_ast)
 
-def _read_template(template_name):
-    with open(template_name, 'r') as template:
-        return ast.parse(template.read())
+def _read_template(template_name, **kwargs):
+    with open(f'./templates/{template_name}', 'r') as template:
+        return ast.parse(template.read().format(**kwargs))
 
 def _write_result(result_file_name, ast_name):
     with open(result_file_name, 'w') as wfile:
