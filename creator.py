@@ -14,13 +14,8 @@ def create_serializers_and_views():
     for mc in model_classes:
         class_fields = [field for field in mc.body if field.__class__ is ast.Assign]
 
-
-        serializers_ast.body.append(ast.parse(f"""
-class {mc.name}Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = {mc.name}
-        fields = ('id',{", ".join([f"'{field_name.targets[0].id}'" for field_name in class_fields])})
-            """))
+        serializers_ast.body.append(_read_template('serializer', model_class_name=mc.name, 
+            field_names=", ".join([f"'{field_name.targets[0].id}'" for field_name in class_fields])))
 
         views_ast.body.append(_read_template('viewset', model_class_name=mc.name))
 
