@@ -6,10 +6,8 @@ def create_serializers_and_views():
         models_ast = ast.parse(file.read())
 
 
-    serializers_ast = ast.parse("""
-from rest_framework import serializers
-from .models import *
-        """)
+    with open('./templates/serializers', 'r') as serializers_template:
+        serializers_ast = ast.parse(serializers_template.read())
 
     views_ast = ast.parse("""
 from rest_framework import viewsets
