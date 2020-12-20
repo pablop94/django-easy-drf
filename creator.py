@@ -1,5 +1,7 @@
 import ast
 import astunparse
+import re
+
 
 def create_serializers_and_views():
     with open('./models.py', 'r') as file:
@@ -8,6 +10,7 @@ def create_serializers_and_views():
 
     serializers_ast = _read_template('serializers')
     views_ast = _read_template('views')
+    urls_ast = _read_template('urls')
 
     model_classes = [clss for clss in models_ast.body if clss.__class__ is ast.ClassDef]
 
@@ -19,8 +22,17 @@ def create_serializers_and_views():
 
         views_ast.body.append(_read_template('viewset', model_class_name=mc.name))
 
+
+        pattern = re.compile(r'(?<!^)(?=[A-Z])')
+        mc_name_snake = pattern.sub('-', mc.name).lower()
+        urls_ast.body.insert(len(urls_ast.body)-1, _read_template('url', model_class_name=mc.name, model_class_name_snake=mc_name_snake))
+
     _write_result('./serializers.py', serializers_ast)
     _write_result('./views.py', views_ast)
+    _write_result('./urls.py', urls_ast)
+
+
+
 
 def _read_template(template_name, **kwargs):
     with open(f'./templates/{template_name}', 'r') as template:

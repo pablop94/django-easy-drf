@@ -13,7 +13,7 @@ class Event(models.Model):
         verbose_name = 'evento'
         verbose_name_plural = 'eventos'
 
-class Perro(models.Model):
+class PerroGrande(models.Model):
     totle = models.TextField(default='Titulo evento')
     detalle = models.TextField('Descripcion', blank=True, null=True)
     foto_pichicho = models.ImageField(verbose_name='Foto de evento', upload_to='evebt_pictures', blank=True, null=True)
