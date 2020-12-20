@@ -29,15 +29,16 @@ class {mc.name}ViewSet(viewsets.ModelViewSet):
             """))
 
 
-    with open('./serializers.py', 'w') as wfile:
-        wfile.write(astunparse.unparse(serializers_ast))
-
-    with open('./views.py', 'w') as wfile:
-        wfile.write(astunparse.unparse(views_ast))
+    _write_result('./serializers.py', serializers_ast)
+    _write_result('./views.py', views_ast)
 
 def _read_template(template_name):
     with open(template_name, 'r') as template:
         return ast.parse(template.read())
+
+def _write_result(result_file_name, ast_name):
+    with open(result_file_name, 'w') as wfile:
+        wfile.write(astunparse.unparse(ast_name)) 
 
 if __name__ == '__main__':
     create_serializers_and_views()
