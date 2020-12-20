@@ -6,14 +6,8 @@ def create_serializers_and_views():
         models_ast = ast.parse(file.read())
 
 
-    with open('./templates/serializers', 'r') as serializers_template:
-        serializers_ast = ast.parse(serializers_template.read())
-
-    views_ast = ast.parse("""
-from rest_framework import viewsets
-from .serializers import *
-from .models import *
-        """)
+    serializers_ast = _read_template('./templates/serializers')
+    views_ast = _read_template('./templates/views')
 
     model_classes = [clss for clss in models_ast.body if clss.__class__ is ast.ClassDef]
 
@@ -41,6 +35,9 @@ class {mc.name}ViewSet(viewsets.ModelViewSet):
     with open('./views.py', 'w') as wfile:
         wfile.write(astunparse.unparse(views_ast))
 
+def _read_template(template_name):
+    with open(template_name, 'r') as template:
+        return ast.parse(template.read())
 
 if __name__ == '__main__':
     create_serializers_and_views()
