@@ -1,10 +1,13 @@
+#!/usr/bin/env python3
+
+import os
 import ast
 import astunparse
 import re
 
 
-def create_serializers_and_views():
-    with open('./models.py', 'r') as file:
+def create_serializers_and_views(current_directory):
+    with open(os.path.join(current_directory, 'models.py'), 'r') as file:
         models_ast = ast.parse(file.read())
 
 
@@ -27,20 +30,20 @@ def create_serializers_and_views():
         mc_name_snake = pattern.sub('-', mc.name).lower()
         urls_ast.body.insert(len(urls_ast.body)-1, _read_template('url', model_class_name=mc.name, model_class_name_snake=mc_name_snake))
 
-    _write_result('./serializers.py', serializers_ast)
-    _write_result('./views.py', views_ast)
-    _write_result('./urls.py', urls_ast)
+
+    _write_result(os.path.join(current_directory, 'serializers.py'), serializers_ast)
+    _write_result(os.path.join(current_directory, 'views.py'), views_ast)
+    _write_result(os.path.join(current_directory, 'urls.py'), urls_ast)
 
 
 
 
 def _read_template(template_name, **kwargs):
-    with open(f'./templates/{template_name}', 'r') as template:
+    script_folder = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(script_folder, f'templates/{template_name}'), 'r') as template:
         return ast.parse(template.read().format(**kwargs))
 
 def _write_result(result_file_name, ast_name):
     with open(result_file_name, 'w') as wfile:
         wfile.write(astunparse.unparse(ast_name)) 
 
-if __name__ == '__main__':
-    create_serializers_and_views()
