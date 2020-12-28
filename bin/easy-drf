@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-from django_easy_drf.creator import create_serializers_and_views
+from django_easy_drf.main import create_all
 
 
-create_serializers_and_views(os.getcwd())
+create_all(os.getcwd())
