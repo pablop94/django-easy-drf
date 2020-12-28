@@ -7,7 +7,7 @@ class ExampleModel(models.Model):
     third_field = models.DecimalField(decimal_places=2, max_digits=10)
 
 
-class EventModel(NameModel):
+class EventModel(models.Model):
     time_event = models.DateTimeField(verbose_name='Horario de evento')
     title = models.TextField(default='Titulo evento')
     description = models.TextField('Descripcion', blank=True, null=True)

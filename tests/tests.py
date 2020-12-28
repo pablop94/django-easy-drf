@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from django_easy_drf.creator import create_all, create_serializers, create_views, create_urls
+from django_easy_drf.main import create_all, create_serializers, create_views, create_urls
 
 
 class FileTestMixin:
