@@ -19,7 +19,8 @@ Warning: This command will override your existing serializers.py, views.py and u
 Note: requires that a file called models.py exists on the current directory.
 
 #### Future developments
-- [ ] Warn users about files override.
+- [x] Warn users about files override.
+- [ ] Allow users to force script without prompt
 - [ ] Allow users to create just one specific file.
 - [ ] Allow users to create just one model.
 - [ ] Allow users to specify different models file.
