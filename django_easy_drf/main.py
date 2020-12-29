@@ -1,11 +1,14 @@
 from .core import Creator, TemplateHandler, FileHandler
 from .drf_handlers import SerializersHandler, ViewsHandler, URLsHandler
-
     
 def create_all(current_directory):
-    creator = _get_creator(current_directory, SerializersHandler, ViewsHandler, URLsHandler)
+    response = input("""Warning: the content of serializers.py, views.py and urls.py will be overwritten
+Do you want to continue? [Y/n] """)
 
-    creator.create()
+    if response == "" or response == 'y' or response == 'Y':
+        creator = _get_creator(current_directory, SerializersHandler, ViewsHandler, URLsHandler)
+
+        creator.create()
 
 def create_serializers(current_directory):
     creator = _get_creator(current_directory, SerializersHandler)

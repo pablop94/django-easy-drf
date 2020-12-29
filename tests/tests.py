@@ -1,6 +1,6 @@
 import unittest
 import os
-
+from unittest.mock import patch
 from django_easy_drf.main import create_all, create_serializers, create_views, create_urls
 
 
@@ -13,25 +13,28 @@ class FileTestMixin:
 class CreateAllFilesTest(FileTestMixin, unittest.TestCase):
 
     def test_create_all_creates_serializers_file_correctly(self):
-        test_folder = os.path.dirname(os.path.abspath(__file__))
+        with patch('builtins.input', return_value='y') as _:
+            test_folder = os.path.dirname(os.path.abspath(__file__))
 
-        create_all(test_folder)
+            create_all(test_folder)
 
-        self._assertFile(test_folder, 'serializers-expected.py', 'serializers.py')
+            self._assertFile(test_folder, 'serializers-expected.py', 'serializers.py')
 
     def test_create_all_creates_views_file_correctly(self):
-        test_folder = os.path.dirname(os.path.abspath(__file__))
+        with patch('builtins.input', return_value='Y') as _:
+            test_folder = os.path.dirname(os.path.abspath(__file__))
 
-        create_all(test_folder)
+            create_all(test_folder)
 
-        self._assertFile(test_folder, 'views-expected.py', 'views.py')
+            self._assertFile(test_folder, 'views-expected.py', 'views.py')
 
     def test_create_all_creates_urls_file_correctly(self):
-        test_folder = os.path.dirname(os.path.abspath(__file__))
+        with patch('builtins.input', return_value='') as _:
+            test_folder = os.path.dirname(os.path.abspath(__file__))
 
-        create_all(test_folder)
+            create_all(test_folder)
 
-        self._assertFile(test_folder, 'urls-expected.py', 'urls.py')
+            self._assertFile(test_folder, 'urls-expected.py', 'urls.py')
 
 
 class CreateSerializerFileTest(FileTestMixin, unittest.TestCase):
