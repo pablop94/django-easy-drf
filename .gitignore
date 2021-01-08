@@ -6,3 +6,6 @@ urls.py
 /dist/
 /*.egg-info
 build/
+models.py
+
+!tests/models.py
