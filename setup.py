@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="django-easy-drf", # Replace with your own username
-    version="0.0.11",
+    version="0.0.12",
     scripts=['bin/easy-drf'],
     author="Pablo Pissi",
     author_email="pablopissi@gmail.com",
