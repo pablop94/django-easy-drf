@@ -17,6 +17,49 @@ This command will create serializers.py, views.py and urls.py files on the same 
 
 Note: requires that a file called models.py exists on the current directory.
 
+Suppose you have a models.py file with the following content:
+```python
+from django.db import models
+
+class ExampleModel(models.Model):
+    some_field = models.IntegerField()
+    some_other_field = models.DecimalField(decimal_places=2, max_digits=10)
+    third_field = models.DecimalField(decimal_places=2, max_digits=10)
+```
+
+The resulting serializers.py will be like this:
+```python
+from rest_framework import serializers
+from .models import *
+
+class ExampleModelSerializer(serializers.ModelSerializer):
+
+    class Meta():
+        model = ExampleModel
+        fields = ('id', 'some_field', 'some_other_field', 'third_field')
+```
+
+The resulting views.py will be like this:
+```python
+from rest_framework import viewsets
+from .serializers import *
+from .models import *
+
+class ExampleModelViewSet(viewsets.ModelViewSet):
+    queryset = ExampleModel.objects.all()
+    serializer_class = ExampleModelSerializer
+```
+
+The resulting urls.py will be like this:
+```python
+from rest_framework.routers import DefaultRouter
+from .views import *
+router = DefaultRouter()
+router.register('example-model', ExampleModelViewSet, basename='example-model')
+urlpatterns = router.urls
+```
+
+
 ##### Forcing creation
 If you want to avoid command prompt, you can force it:
 ```
