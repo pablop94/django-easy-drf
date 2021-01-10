@@ -34,7 +34,6 @@ class SerializersHandler(DRFHandler):
             field_names=", ".join([f"'{field_name.targets[0].id}'" for field_name in class_fields])))
 
 
-
 class ViewsHandler(DRFHandler):
     @property
     def code(self):

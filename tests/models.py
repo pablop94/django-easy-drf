@@ -12,6 +12,9 @@ class EventModel(models.Model):
     title = models.TextField(default='Titulo evento')
     description = models.TextField('Descripcion', blank=True, null=True)
 
-    class Meta:
-        verbose_name = 'evento'
-        verbose_name_plural = 'eventos'
+
+class DogModel(models.Model):
+    name = models.DateTimeField(verbose_name='Horario de evento')
+    age = models.TextField(default='Titulo evento')
+    is_good_boy = models.BooleanField()
+
