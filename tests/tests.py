@@ -2,6 +2,7 @@ import unittest
 import os
 from unittest.mock import patch
 from django_easy_drf.main import create_all
+from django_easy_drf.errors import InvalidModelError
 
 
 FILES = ['serializers.py', 'views.py', 'urls.py']
@@ -65,6 +66,30 @@ class CreateAllFilesTest(FileTestMixin, unittest.TestCase):
             self.assertFile(test_folder, 'urls-expected-specific-models.py', 'urls.py')
             self.assertFile(test_folder, 'serializers-expected-specific-models.py', 'serializers.py')
             self.assertFile(test_folder, 'views-expected-specific-models.py', 'views.py')
+
+    def test_create_all_with_invalid_model_raises_error(self):
+        with patch('builtins.input', return_value='') as _:
+            test_folder = self.get_test_folder()
+
+            with self.assertRaises(InvalidModelError) as context:
+                create_all(test_folder, ['u', 'v', 's'], models=['InvalidModel', 'DogModel',])
+
+            self.assertEqual('InvalidModelError: InvalidModel not found on models.py', str(context.exception))
+            self.assertFalse(os.path.exists(os.path.join(test_folder, 'serializers.py')))
+            self.assertFalse(os.path.exists(os.path.join(test_folder, 'views.py')))
+            self.assertFalse(os.path.exists(os.path.join(test_folder, 'urls.py')))
+
+    def test_create_all_with_invalid_models_raises_error(self):
+        with patch('builtins.input', return_value='') as _:
+            test_folder = self.get_test_folder()
+
+            with self.assertRaises(InvalidModelError) as context:
+                create_all(test_folder, ['u', 'v', 's'], models=['InvalidModel', 'DogModel', 'InvalidModel2',])
+
+            self.assertEqual('InvalidModelError: InvalidModel, InvalidModel2 not found on models.py', str(context.exception))
+            self.assertFalse(os.path.exists(os.path.join(test_folder, 'serializers.py')))
+            self.assertFalse(os.path.exists(os.path.join(test_folder, 'views.py')))
+            self.assertFalse(os.path.exists(os.path.join(test_folder, 'urls.py')))
 
 
 class CommandLineTest(FileTestMixin, unittest.TestCase):

@@ -1,6 +1,7 @@
 import os
 import ast
 import astunparse
+from .errors import InvalidModelError
 
 class Creator:
     def __init__(self, directory, drf_handlers, template_handler):
@@ -29,10 +30,22 @@ class TemplateHandler:
         path  = os.path.join(directory, 'models.py')
         models_ast = ast.parse(self.file_handler.read(path))
 
+        model_classes = [clss for clss in models_ast.body if clss.__class__ is ast.ClassDef]
+
+
         if models:
-            return [clss for clss in models_ast.body if clss.__class__ is ast.ClassDef and clss.name in models]
+            classes = []
+
+            for clss in model_classes:
+                if clss.name in models:
+                    classes.append(clss)
+                    models.remove(clss.name)
+
+            if len(models) > 0:
+                raise InvalidModelError('InvalidModelError: {0} not found on models.py'.format(', '.join(models)))
+            return classes
         else:
-            return [clss for clss in models_ast.body if clss.__class__ is ast.ClassDef]
+            return model_classes
 
     def get_template(self, template_name, **template_kwargs):
         script_folder = os.path.dirname(os.path.abspath(__file__))
