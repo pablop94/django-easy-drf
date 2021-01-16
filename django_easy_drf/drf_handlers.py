@@ -1,12 +1,9 @@
 import ast
-import re
 import os
+from .import_handlers import *
+from .utils import get_viewset_name, get_serializer_name
 
-def get_viewset_name(model_class_name):
-    return f'{model_class_name}ViewSet'
 
-def get_serializer_name(model_class_name):
-    return f'{model_class_name}Serializer'
 
 class DRFHandler:
     def __init__(self, template_handler):
@@ -100,66 +97,3 @@ class URLsHandler(DRFHandler):
         template.body.insert(len(template.body)-1, self.template_handler.get_template('url', 
             viewset_name=get_viewset_name(model_class.name), 
             model_class_name_snake=mc_name_snake))
-
-
-class ImportHandler:
-    def __init__(self, template_handler, file_name):
-        self.template_handler = template_handler
-        self.file_name = file_name
-
-    def is_relative_import(self, element, import_name):
-        return element.__class__ is ast.ImportFrom and element.module == import_name and element.level == 1
-
-class ExistingSerializerImportHandler(ImportHandler):
-    def get_import_template(self, model_classes):
-        template = self.template_handler.get_file(self.file_name)
-
-        for element in template.body:
-            if self.is_relative_import(element, 'models'):
-                for model_class in model_classes:
-                    element.names.append(ast.alias(model_class.name, None))
-
-        return template
-
-class NonExistingSerializerImportHandler(ImportHandler):
-    def get_import_template(self, model_classes):
-        return self.template_handler.get_template(self.file_name, 
-            model_classes=", ".join([model_class.name for model_class in model_classes]))
-
-class ExistingViewImportHandler(ImportHandler):
-    def get_import_template(self, model_classes):
-        template = self.template_handler.get_file(self.file_name)
-
-        for element in template.body:
-            if self.is_relative_import(element, 'models'):
-                for model_class in model_classes:
-                    element.names.append(ast.alias(model_class.name, None))
-
-            if self.is_relative_import(element, 'serializers'):
-                for model_class in model_classes:
-                    element.names.append(ast.alias(get_serializer_name(model_class.name), None))
-
-        return template
-
-class NonExistingViewImportHandler(ImportHandler):
-    def get_import_template(self, model_classes):
-        return self.template_handler.get_template(self.file_name, 
-            model_classes=", ".join([model_class.name for model_class in model_classes]),
-            serializer_classes=", ".join([get_serializer_name(model_class.name) for model_class in model_classes])
-            )
-
-
-class ExistingURLImportHandler(ImportHandler):
-    def get_import_template(self, model_classes):
-        template = self.template_handler.get_file(self.file_name)
-
-        for element in template.body:
-            if self.is_relative_import(element, 'views'):
-                for model_class in model_classes:
-                    element.names.append(ast.alias(get_viewset_name(model_class.name), None))
-
-        return template
-
-class NonExistingURLImportHandler(ImportHandler):
-    def get_import_template(self, model_classes):
-        return self.template_handler.get_template(self.file_name, viewset_names=", ".join([get_viewset_name(model_class.name) for model_class in model_classes]))
