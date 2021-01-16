@@ -51,7 +51,13 @@ class TemplateHandler:
         script_folder = os.path.dirname(os.path.abspath(__file__))
         path = os.path.join(script_folder, f'templates/{template_name}')
 
-        return ast.parse(self.file_handler.read(path, **template_kwargs))
+        return self.get_file(path, **template_kwargs)
+
+    def get_file(self, path, **kwargs):
+        return self.get_parsed_file(self.file_handler.read(path, **kwargs))
+
+    def get_parsed_file(self, file_content):
+        return ast.parse(file_content)
 
     def write_result(self, result_file_name, template):
         self.file_handler.write(result_file_name, astunparse.unparse(template))
@@ -65,5 +71,3 @@ class FileHandler:
     def write(self, path, content):
          with open(path, 'w') as wfile:
             wfile.write(content) 
-
-    

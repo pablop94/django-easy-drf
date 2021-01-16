@@ -94,6 +94,40 @@ class CreateAllFilesTest(FileTestMixin, unittest.TestCase):
             self.assertFalse(os.path.exists(os.path.join(test_folder, 'views.py')))
             self.assertFalse(os.path.exists(os.path.join(test_folder, 'urls.py')))
 
+    def test_create_all_appends_new_serializers_if_serializers_file_exists(self):
+        test_folder = self.get_test_folder()
+        with open(os.path.join(test_folder, 'expected_files/', 'serializers-expected-specific-models.py'), 'r') as existing_serializer:
+            with open(os.path.join(test_folder, 'serializers.py'), 'w') as existing_file:
+                existing_file.write(existing_serializer.read())
+        
+        with patch('builtins.input', return_value='y') as _:
+
+            create_all(test_folder, ['s'], models=["EventModel"])
+
+        self.assertFile(test_folder, 'serializers-expected-append.py', 'serializers.py')
+
+    def test_create_all_appends_new_views_if_views_file_exists(self):
+        test_folder = self.get_test_folder()
+        with open(os.path.join(test_folder, 'expected_files/', 'views-expected-specific-models.py'), 'r') as existing_views:
+            with open(os.path.join(test_folder, 'views.py'), 'w') as existing_file:
+                existing_file.write(existing_views.read())
+        
+        with patch('builtins.input', return_value='y') as _:
+            create_all(test_folder, ['v'], models=["EventModel"])
+
+        self.assertFile(test_folder, 'views-expected-append.py', 'views.py')
+
+    def test_create_all_appends_new_urls_if_urls_file_exists(self):
+        test_folder = self.get_test_folder()
+        with open(os.path.join(test_folder, 'expected_files/', 'urls-expected-specific-models.py'), 'r') as existing_urls:
+            with open(os.path.join(test_folder, 'urls.py'), 'w') as existing_file:
+                existing_file.write(existing_urls.read())
+        
+        with patch('builtins.input', return_value='y') as _:
+            create_all(test_folder, ['u'], models=["EventModel"])
+
+        self.assertFile(test_folder, 'urls-expected-append.py', 'urls.py')
+
 
 class CommandLineTest(FileTestMixin, unittest.TestCase):
     def test_command_line_override_false_do_not_create_files(self):
