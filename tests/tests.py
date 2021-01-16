@@ -11,7 +11,10 @@ class FileTestMixin:
     def assertFile(self, folder, expected_path, actual_path):
         with open(os.path.join(folder, 'expected_files/', expected_path), 'r') as expected_file:
             with open(os.path.join(folder, actual_path), 'r') as actual_file:
-                self.assertEqual(expected_file.read(), actual_file.read())
+                actual_lines = actual_file.read().splitlines()
+                expected_lines = expected_file.read().splitlines()
+                for line_index in range(0, len(expected_lines)):
+                    self.assertEqual(expected_lines[line_index], actual_lines[line_index])
 
     def tearDown(self):
         for file in FILES:
@@ -98,17 +101,13 @@ class CommandLineTest(FileTestMixin, unittest.TestCase):
         with patch('builtins.input', return_value='n') as _:
             create_all(test_folder, ['v', 's', 'u'])
             for file in FILES:
-                self.assertFalse(os.path.exists(os.path.join(test_folder, 'serializers.py')))
-                self.assertFalse(os.path.exists(os.path.join(test_folder, 'views.py')))
-                self.assertFalse(os.path.exists(os.path.join(test_folder, 'urls.py')))
+                self.assertFalse(os.path.exists(os.path.join(test_folder, file)))
 
     def test_command_line_override_force_true_create_files_without_prompt(self):
         test_folder = self.get_test_folder()
         create_all(test_folder, ['v', 's', 'u'], force=True)
         for file in FILES:
-            self.assertTrue(os.path.exists(os.path.join(test_folder, 'serializers.py')))
-            self.assertTrue(os.path.exists(os.path.join(test_folder, 'views.py')))
-            self.assertTrue(os.path.exists(os.path.join(test_folder, 'urls.py')))
+            self.assertTrue(os.path.exists(os.path.join(test_folder, file)))
 
 
 if __name__ == '__main__':
