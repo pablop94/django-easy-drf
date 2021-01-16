@@ -1,6 +1,12 @@
 import ast
 import re
 
+def get_viewset_name(model_class_name):
+    return f'{model_class_name}ViewSet'
+
+def get_serializer_name(model_class_name):
+    return f'{model_class_name}Serializer'
+
 class DRFHandler:
     def __init__(self, template_handler):
         super().__init__()
@@ -17,6 +23,9 @@ class DRFHandler:
     def handle(self, template, model_class):
         raise NotImplementedError('handle must be implemented by subclass')
 
+    def get_import_template(self, *args):
+        return self.template_handler.get_template(self.code)
+
 
 class SerializersHandler(DRFHandler):
     @property
@@ -26,6 +35,10 @@ class SerializersHandler(DRFHandler):
     @property
     def result_name(self):
         return 'serializers.py'
+
+    def get_import_template(self, model_classes):
+        return self.template_handler.get_template(self.code, 
+            model_classes=", ".join([model_class.name for model_class in model_classes]))
 
     def handle(self, template, model_class):
         class_fields = [field for field in model_class.body if field.__class__ is ast.Assign]
@@ -43,9 +56,17 @@ class ViewsHandler(DRFHandler):
     def result_name(self):
         return 'views.py'
 
-    def handle(self, template, model_class):
-        template.body.append(self.template_handler.get_template('viewset', model_class_name=model_class.name))
+    def get_import_template(self, model_classes):
+        return self.template_handler.get_template(self.code, 
+            model_classes=", ".join([model_class.name for model_class in model_classes]),
+            serializer_classes=", ".join([get_serializer_name(model_class.name) for model_class in model_classes])
+            )
 
+    def handle(self, template, model_class):
+        template.body.append(self.template_handler.get_template('viewset', 
+        viewset_name=get_viewset_name(model_class.name),
+        serializer_class_name=get_serializer_name(model_class.name),
+        model_class_name=model_class.name))
 
 class URLsHandler(DRFHandler):
     @property
@@ -56,9 +77,14 @@ class URLsHandler(DRFHandler):
     def result_name(self):
         return 'urls.py'
 
+    def get_import_template(self, model_classes):
+        return self.template_handler.get_template(self.code, viewset_names=", ".join([get_viewset_name(model_class.name) for model_class in model_classes]))
+
     def handle(self, template, model_class):
         pattern = re.compile(r'(?<!^)(?=[A-Z])')
         mc_name_snake = pattern.sub('-', model_class.name).lower()
-        template.body.insert(len(template.body)-1, self.template_handler.get_template('url', model_class_name=model_class.name, model_class_name_snake=mc_name_snake))
+        template.body.insert(len(template.body)-1, self.template_handler.get_template('url', 
+            viewset_name=get_viewset_name(model_class.name), 
+            model_class_name_snake=mc_name_snake))
 
 

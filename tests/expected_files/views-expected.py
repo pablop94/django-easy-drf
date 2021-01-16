@@ -1,7 +1,7 @@
 
 from rest_framework import viewsets
-from .serializers import *
-from .models import *
+from .serializers import ExampleModelSerializer, EventModelSerializer, DogModelSerializer
+from .models import ExampleModel, EventModel, DogModel
 
 class ExampleModelViewSet(viewsets.ModelViewSet):
     queryset = ExampleModel.objects.all()

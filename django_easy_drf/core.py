@@ -14,7 +14,7 @@ class Creator:
 
         templates = dict()
         for handler in self.drf_handlers:
-            templates[handler.code] = self.template_handler.get_template(handler.code)
+            templates[handler.code] = handler.get_import_template(model_classes)
 
             for model_class in model_classes:
                 handler.handle(templates.get(handler.code), model_class)

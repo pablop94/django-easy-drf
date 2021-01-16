@@ -1,3 +1,3 @@
-class {model_class_name}ViewSet(viewsets.ModelViewSet):
+class {viewset_name}(viewsets.ModelViewSet):
     queryset = {model_class_name}.objects.all()
-    serializer_class = {model_class_name}Serializer
+    serializer_class = {serializer_class_name}

@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import *
+from .models import ExampleModel, EventModel, DogModel
 
 class ExampleModelSerializer(serializers.ModelSerializer):
 
