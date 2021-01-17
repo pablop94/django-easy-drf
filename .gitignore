@@ -7,5 +7,6 @@ urls.py
 /*.egg-info
 build/
 models.py
+TODO.txt
 
 !tests/models.py

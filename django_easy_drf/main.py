@@ -8,16 +8,16 @@ files_mapping = {
     'u': URLsHandler
 }
 
-def create_all(current_directory, files, force=False):
+def create_all(current_directory, files, force=False, **kwargs):
 
     if not force:
-        response = input("""Warning: the content of serializers.py, views.py and urls.py will be overwritten
+        response = input("""Warning: the content of serializers.py, views.py and urls.py will be modified.
 Do you want to continue? [Y/n] """)
 
     if force or response == "" or response == 'y' or response == 'Y':
         creator = get_creator(current_directory, *get_file_handlers(files))
 
-        creator.create()
+        creator.create(**kwargs)
 
 def get_file_handlers(files):
     return [files_mapping.get(file_key) for file_key in files]
