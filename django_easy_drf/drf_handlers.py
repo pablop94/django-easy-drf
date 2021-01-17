@@ -21,8 +21,11 @@ class DRFHandler:
     def handle(self, template, model_class):
         raise NotImplementedError('handle must be implemented by subclass')
 
-    def get_import_template(self, *args):
-        return self.template_handler.get_template(self.code)
+    def get_import_handler(self):
+        raise NotImplementedError('get_import_handler must be implemented by subclass')
+
+    def get_import_template(self, model_classes):
+        return self.get_import_handler().get_import_template(model_classes)
 
 
 class SerializersHandler(DRFHandler):
@@ -38,9 +41,6 @@ class SerializersHandler(DRFHandler):
         if os.path.exists(self.result_name):
             return ExistingSerializerImportHandler(self.template_handler, self.result_name)
         return NonExistingSerializerImportHandler(self.template_handler, self.code)
-
-    def get_import_template(self, model_classes):
-        return self.get_import_handler().get_import_template(model_classes)
 
     def handle(self, template, model_class):
         class_fields = [field for field in model_class.body if field.__class__ is ast.Assign]
@@ -65,14 +65,12 @@ class ViewsHandler(DRFHandler):
             return ExistingViewImportHandler(self.template_handler, self.result_name)
         return NonExistingViewImportHandler(self.template_handler, self.code)
 
-    def get_import_template(self, model_classes):
-        return self.get_import_handler().get_import_template(model_classes)
-       
     def handle(self, template, model_class):
         template.body.append(self.template_handler.get_template('viewset', 
         viewset_name=get_viewset_name(model_class.name),
         serializer_class_name=get_serializer_name(model_class.name),
         model_class_name=model_class.name))
+
 
 class URLsHandler(DRFHandler):
     @property
@@ -87,9 +85,6 @@ class URLsHandler(DRFHandler):
         if os.path.exists(self.result_name):
             return ExistingURLImportHandler(self.template_handler, self.result_name)
         return NonExistingURLImportHandler(self.template_handler, self.code)
-
-    def get_import_template(self, model_classes):
-        return self.get_import_handler().get_import_template(model_classes)
 
     def handle(self, template, model_class):
         pattern = re.compile(r'(?<!^)(?=[A-Z])')
