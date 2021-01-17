@@ -11,7 +11,7 @@ files_mapping = {
 def create_all(current_directory, files, force=False, **kwargs):
 
     if not force:
-        response = input("""Warning: the content of serializers.py, views.py and urls.py will be overwritten
+        response = input("""Warning: the content of serializers.py, views.py and urls.py will be modified.
 Do you want to continue? [Y/n] """)
 
     if force or response == "" or response == 'y' or response == 'Y':
